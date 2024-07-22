@@ -3,7 +3,7 @@ package com.entertainment.account_service.dto;
 public class AuthenticationResponse {
     private String username;
     private String role;
-    private Integer customerId;
+//    private Integer customerId;
 
     public String getUsername() {
         return username;
@@ -22,11 +22,11 @@ public class AuthenticationResponse {
         this.role = role;
     }
 
-    public Integer getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(Integer customerId) {
-        this.customerId = customerId;
-    }
+//    public Integer getCustomerId() {
+//        return customerId;
+//    }
+//
+//    public void setCustomerId(Integer customerId) {
+//        this.customerId = customerId;
+//    }
 }

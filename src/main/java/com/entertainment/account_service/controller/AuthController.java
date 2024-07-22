@@ -59,7 +59,7 @@ public class AuthController {
             // Tạo phản hồi
             AuthenticationResponse response = new AuthenticationResponse();
             response.setUsername(account.getUsername()); //lấy username từ tài khoản
-            response.setRole(role);
+            response.setRole(role); //lấy role từ tài khoản
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
@@ -76,8 +76,4 @@ public class AuthController {
         }
         return ResponseEntity.ok(account);
     }
-
-
-
-
 }
