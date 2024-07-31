@@ -29,7 +29,7 @@ public class SecurityConfig {
 
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/accounts/login").permitAll()
                         .requestMatchers("/api/accounts/all/employees", "/api/accounts/all/customers").permitAll()
                         .requestMatchers("/api/accounts/signup/employee", "/api/accounts/signup/customer").permitAll()
                         .requestMatchers("/api/accounts/updateTime/{username}").permitAll()
