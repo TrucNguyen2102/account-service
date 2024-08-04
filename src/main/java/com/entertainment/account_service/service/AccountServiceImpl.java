@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,6 +39,8 @@ public class AccountServiceImpl implements AccountService{
 //        account.setUpdatedTime(LocalDateTime.now());
 //        return accountRepository.save(account);
 //    }
+
+
 
     @Override
     public Account save(Account account) {
@@ -108,33 +111,32 @@ public class AccountServiceImpl implements AccountService{
         }
     }
 
-//    @Override
-//    public void lockAccount(String username) {
-//        Account account = accountRepository.findByUsername(username);
-//        if (account != null) {
-//            account.setEnabled(false); // Giả sử bạn dùng cột 'enabled' để biểu thị trạng thái khóa tài khoản
-//            accountRepository.save(account);
-//        } else {
-//            throw new RuntimeException("Tài khoản không tồn tại.");
-//        }
-//    }
+    @Override
+    public void changePassword(String username, String oldPassword, String newPassword) throws Exception {
+        Account account = accountRepository.findByUsername(username);
+        if (account == null) {
+            throw new Exception("Tài khoản không tồn tại");
+        }
 
-//    @Override
-//    public List<AccountEmployeeDTO> getAllAccounts() {
-//        List<Account> accounts = accountRepository.findAll();
-//        return accounts.stream()
-//                .map(account -> new AccountEmployeeDTO(account.getUsername(), account.getCreatedTime(), account.getUpdatedTime()))
-//                .collect(Collectors.toList());
-//    }
+        if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
+            throw new Exception("Mật khẩu cũ không đúng");
+        }
 
-//    @Override
-//    public List<AccountEmployeeDTO> getAccountsByRoles(List<String> roleNames) {
-//        List<Account> accounts = accountRepository.findByRoleNameIn(roleNames);
-//        return accounts.stream()
-//                .map(account -> new AccountEmployeeDTO(account.getUsername(),
-//                        account.getCreatedTime(), account.getUpdatedTime()))
-//                .collect(Collectors.toList());
-//    }
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        account.setPassword(encodedPassword);
+        accountRepository.save(account);
+    }
 
+
+    @Transactional
+    public void updateAccountTime(String username) {
+        Account account = accountRepository.findByUsername(username);
+        if (account != null) {
+            account.setUpdatedTime(LocalDateTime.now()); // Cập nhật thời gian
+            accountRepository.save(account);
+        } else {
+            throw new EntityNotFoundException("Account not found with username: " + username);
+        }
+    }
 
 }

@@ -5,6 +5,7 @@ import com.entertainment.account_service.entity.Account;
 import com.entertainment.account_service.entity.AccountStatus;
 import com.entertainment.account_service.repository.AccountRepository;
 import com.entertainment.account_service.service.AccountService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -119,10 +121,10 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedAccount);
     }
 
-    //hiển thị danh sách nhân viên có role là 1,2(manager,employee)
+    //hiển thị danh sách nhân viên có role là 2(employee)
     @GetMapping("/all/employees")
     public ResponseEntity<List<AccountEmployeeDTO>> getAccountsByRoles() {
-        List<AccountEmployeeDTO> accounts = accountService.getAccountsByRoleIds(Arrays.asList(1,2));
+        List<AccountEmployeeDTO> accounts = accountService.getAccountsByRoleIds(Arrays.asList(2));
         return ResponseEntity.ok(accounts);
     }
 
@@ -135,16 +137,16 @@ public class AccountController {
 
     //cập nhật thời gian cập nhật khi có sự thay đổi thông tin cá nhân
     @PutMapping("/updateTime/{username}")
-    @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<Account> updateAccountTime(@PathVariable String username) {
-        Account account = accountService.findByUsername(username);
-        if (account != null) {
-            account.setUpdatedTime(LocalDateTime.now()); // Cập nhật thời gian
-            accountService.save(account);
-            return ResponseEntity.ok(account);
+    @PreAuthorize("hasRole('MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<String> updateAccountTime(@PathVariable String username) {
+        try {
+            accountService.updateAccountTime(username);
+            return ResponseEntity.ok("Time updated successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
+
 
     //khóa tài khoản nhân viên
     @PutMapping("/lock/{username}")
@@ -165,6 +167,20 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unlock account.");
+        }
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) {
+        String username = payload.get("username");
+        String oldPassword = payload.get("oldPassword");
+        String newPassword = payload.get("newPassword");
+
+        try {
+            accountService.changePassword(username, oldPassword, newPassword);
+            return ResponseEntity.ok().body("Đổi mật khẩu thành công.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

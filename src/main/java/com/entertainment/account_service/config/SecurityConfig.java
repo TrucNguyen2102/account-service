@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/accounts/signup/employee", "/api/accounts/signup/customer").permitAll()
                         .requestMatchers("/api/accounts/updateTime/{username}").permitAll()
                         .requestMatchers("/api/accounts/lock/**", "/api/accounts/unlock/**").permitAll()
-
+                        .requestMatchers("/api/accounts/change-password").permitAll()
                         .anyRequest().authenticated()
                 );
 //                .formLogin(form -> form
