@@ -137,12 +137,13 @@ public class AccountController {
 
     //cập nhật thời gian cập nhật khi có sự thay đổi thông tin cá nhân
     @PutMapping("/updateTime/{username}")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('CUSTOMER')")
+//    @PreAuthorize("hasRole('MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<String> updateAccountTime(@PathVariable String username) {
         try {
             accountService.updateAccountTime(username);
             return ResponseEntity.ok("Time updated successfully.");
         } catch (EntityNotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.notFound().build();
         }
     }
